@@ -13,7 +13,7 @@ if ($LASTEXITCODE -ne 0) {
 $gitRoot = git rev-parse --show-toplevel
 $stateFile = "$gitRoot/.git/untrack-ignored.removed"
 
-$files = git ls-files | git check-ignore --stdin | ForEach-Object {
+$files = (cmd /c "git ls-files | git check-ignore --no-index --stdin 2>nul") | ForEach-Object {
     $_ -replace '^"|"$' -replace '\\r$'
 }
 
@@ -32,8 +32,7 @@ switch ($mode) {
     $RM
     {
         $removed = @()
-        $files | ForEach-Object
-        {
+        $files | ForEach-Object {
             git rm --cached $_
             if ($LASTEXITCODE -eq 0) { $removed += $_ }
         }
